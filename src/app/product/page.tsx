@@ -1,6 +1,9 @@
+"use client";
+
 import { getData } from "@/services/products";
 import Image from "next/image";
 import Link from "next/link";
+import useSWR from "swr";
 
 type ProductPageProps = {
   params: {
@@ -8,9 +11,16 @@ type ProductPageProps = {
   };
 };
 
-export default async function DetailProductPage(props: ProductPageProps) {
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+export default function DetailProductPage(props: ProductPageProps) {
   const { params } = props;
-  const products = await getData("http://localhost:3000/api/product");
+  // const products = await getData(`${process.env.NEXT_PUBLIC_API_URL}/api/product`);
+  const { data, error, isLoading } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/product`, fetcher);
+
+  const products = {
+    data: data?.data || [],
+  };
 
   return (
     <div className="grid grid-cols-4 gap-x-4 mt-4 place-items-center">
